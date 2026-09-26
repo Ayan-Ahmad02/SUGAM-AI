@@ -12,7 +12,6 @@ import {
   Layers
 } from 'lucide-react';
 import { BISEmblem } from './BISEmblem';
-import { TricolorRibbon } from './TricolorRibbon';
 import { SugamLogo } from './SugamLogo';
 import { useAuth, UserRole } from '../../context/AuthContext';
 import { useLanguage, SUPPORTED_LANGUAGES, SupportedLanguage } from '../../context/LanguageContext';
@@ -36,9 +35,6 @@ export const Header: React.FC = () => {
 
   return (
     <header className="relative bg-white border-b border-slate-200/90 select-none shadow-xs">
-      {/* Top right Indian Tricolor Ribbon accent */}
-      <TricolorRibbon className="absolute top-0 right-0 w-48 h-5 z-20 pointer-events-none" />
-
       <div className="flex items-center justify-between px-4 lg:px-6 py-2.5 gap-4">
         {/* Left: Brand Logo on White Background */}
         <div className="w-60 shrink-0 hidden lg:flex items-center">
