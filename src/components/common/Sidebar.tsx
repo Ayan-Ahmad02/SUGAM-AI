@@ -81,13 +81,9 @@ export const Sidebar: React.FC = () => {
         )}
       </nav>
 
-      {/* Bottom Heritage Monument Graphic (Image 2) */}
-      <div className="p-3 bg-[#0A1628] border-t border-slate-800/80 flex flex-col items-center">
-        <img
-          src="/sidebar-monument.png"
-          alt="Simpler Compliance Stronger India"
-          className="w-full max-w-[190px] h-auto object-contain"
-        />
+      {/* Bottom Heritage Monument Graphic (Image 2 Vector) */}
+      <div className="p-4 bg-[#071120] border-t border-slate-800/80 flex flex-col items-center">
+        <MonumentsIllustration theme="dark" showText={true} />
       </div>
     </aside>
   );

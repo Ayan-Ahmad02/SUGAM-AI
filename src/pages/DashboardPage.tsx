@@ -28,6 +28,7 @@ import {
 import { StatusBadge } from '../components/common/StatusBadge';
 import { AtmanirbharBadge } from '../components/common/AtmanirbharBadge';
 import { MonumentsIllustration } from '../components/common/MonumentsIllustration';
+import { GreetingBanner } from '../components/common/GreetingBanner';
 import { apiGetDashboard } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -88,14 +89,8 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-4 select-none">
-      {/* 1. Welcome Greeting Banner (Image 4) */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
-        <img
-          src="/greeting-banner.png"
-          alt="Good Morning, Afnan! - Bureau of Indian Standards"
-          className="w-full h-auto object-cover block"
-        />
-      </div>
+      {/* 1. Welcome Greeting Banner (Native SVG matching Image 4) */}
+      <GreetingBanner />
 
       {/* 2. Main 2-Column Dashboard Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4.5 items-start">
