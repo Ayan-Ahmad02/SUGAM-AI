@@ -2,37 +2,37 @@ import React from 'react';
 
 export const AtmanirbharBadge: React.FC<{ className?: string }> = ({ className = '' }) => {
   return (
-    <div className={`relative flex items-center justify-between p-3 bg-gradient-to-r from-blue-50/70 to-slate-50 border border-slate-200/80 rounded-xl overflow-hidden shadow-subtle ${className}`}>
+    <div className={`relative flex items-center justify-between p-3.5 bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-subtle ${className}`}>
       {/* Decorative India silhouette */}
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center p-1.5 shadow-sm">
-          <svg viewBox="0 0 40 40" fill="none" className="w-full h-full">
+      <div className="flex items-center gap-3 z-10">
+        <div className="w-10 h-10 shrink-0 flex items-center justify-center">
+          <svg viewBox="0 0 44 48" fill="none" className="w-full h-full">
             {/* India Map stylized geometry */}
             <path
-              d="M18 6 L22 8 L24 12 L28 14 L30 18 L26 22 L24 28 L20 34 L16 32 L14 26 L10 20 L12 14 L16 10 Z"
-              fill="#0284C7"
-              opacity="0.8"
+              d="M20 3 L23 7 L26 8 L27 12 L33 14 L34 19 L28 24 L27 30 L22 38 L20 45 L18 45 L15 36 L12 28 L8 22 L10 16 L14 12 L17 11 L18 6 Z"
+              fill="#0E3A5A"
             />
             {/* Ashoka Chakra in center */}
-            <circle cx="20" cy="20" r="3.5" stroke="#000080" strokeWidth="0.8" fill="none" />
-            <circle cx="20" cy="20" r="0.8" fill="#000080" />
+            <circle cx="21" cy="23" r="3.5" stroke="#38BDF8" strokeWidth="1" fill="#0E3A5A" />
+            <circle cx="21" cy="23" r="0.8" fill="#38BDF8" />
           </svg>
         </div>
         <div>
-          <h5 className="text-[12px] font-bold text-slate-800 leading-tight">
+          <h5 className="text-xs font-bold text-slate-800 leading-tight">
             Atmanirbhar Bharat
           </h5>
-          <p className="text-[11px] text-slate-500">
-            Through Quality & Standards
+          <p className="text-[11px] font-medium text-slate-600">
+            Through Quality
           </p>
         </div>
       </div>
 
-      {/* Tricolor corner wave */}
-      <div className="absolute right-0 bottom-0 top-0 w-20 pointer-events-none opacity-80">
-        <svg viewBox="0 0 80 48" fill="none" className="w-full h-full">
-          <path d="M10 0 C40 20, 50 10, 80 30 L80 48 L0 48 Z" fill="#138808" opacity="0.15" />
-          <path d="M30 0 C55 15, 65 5, 80 20 L80 30 L10 0 Z" fill="#FF9933" opacity="0.2" />
+      {/* Tricolor corner wave swoop at bottom right */}
+      <div className="absolute right-0 bottom-0 w-32 h-16 pointer-events-none">
+        <svg viewBox="0 0 130 65" fill="none" className="w-full h-full">
+          <path d="M0 65 C40 60, 75 35, 130 15 L130 25 C80 45, 50 65, 0 65 Z" fill="#FF9933" opacity="0.8" />
+          <path d="M10 65 C50 62, 85 45, 130 25 L130 35 C90 52, 60 65, 10 65 Z" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="0.5" />
+          <path d="M20 65 C60 65, 95 55, 130 35 L130 65 L20 65 Z" fill="#138808" opacity="0.75" />
         </svg>
       </div>
     </div>
