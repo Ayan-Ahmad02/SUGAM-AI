@@ -28,7 +28,6 @@ import {
 import { StatusBadge } from '../components/common/StatusBadge';
 import { AtmanirbharBadge } from '../components/common/AtmanirbharBadge';
 import { MonumentsIllustration } from '../components/common/MonumentsIllustration';
-import { GreetingBanner } from '../components/common/GreetingBanner';
 import { apiGetDashboard } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -89,8 +88,43 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-4 select-none">
-      {/* 1. Welcome Greeting Banner (Native SVG matching Image 4) */}
-      <GreetingBanner />
+      {/* 1. Welcome Greeting Banner */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 lg:px-7 lg:py-5 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 relative overflow-hidden">
+        {/* Tricolor wave swoop in the top right */}
+        <div className="absolute top-0 right-0 w-64 h-full pointer-events-none opacity-85">
+          <svg viewBox="0 0 240 80" fill="none" className="w-full h-full" preserveAspectRatio="none">
+            <path d="M40 0 C110 35, 160 5, 240 25 L240 0 Z" fill="#FF9933" opacity="0.45" />
+            <path d="M15 0 C95 45, 145 15, 240 45 L240 25 C160 5, 110 35, 40 0 Z" fill="#FFFFFF" opacity="0.75" />
+            <path d="M0 10 C80 55, 130 25, 240 65 L240 45 C145 15, 95 45, 15 0 Z" fill="#138808" opacity="0.35" />
+          </svg>
+        </div>
+
+        {/* Left greeting text */}
+        <div className="z-10">
+          <h1 className="text-xl lg:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <span>Good Morning, {user?.name?.split(' ')[0] || 'Afnan'}!</span>
+            <span>👋</span>
+          </h1>
+          <p className="text-xs lg:text-sm text-slate-500 mt-0.5 font-medium">
+            Let's make compliance simpler, together.
+          </p>
+        </div>
+
+        {/* Center/Right monuments illustration & quote */}
+        <div className="hidden md:flex items-center gap-4 z-10 mr-12 lg:mr-16">
+          <div className="w-24 h-12 shrink-0 opacity-40">
+            <MonumentsIllustration theme="light" showText={false} className="scale-90" />
+          </div>
+          <div className="text-left">
+            <p className="text-xs font-serif italic text-slate-700 leading-snug">
+              "Standards build trust, compliance builds a better tomorrow."
+            </p>
+            <p className="text-[10px] text-blue-700 font-bold mt-0.5">
+              — Bureau of Indian Standards
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* 2. Main 2-Column Dashboard Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-4.5 items-start">
