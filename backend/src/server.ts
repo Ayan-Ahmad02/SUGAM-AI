@@ -88,11 +88,13 @@ app.use('/api/saved', savedRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`==================================================`);
-  console.log(`🚀 SUGAM-AI Express Server active on http://localhost:${PORT}`);
-  console.log(`📡 REST API endpoints mounted under /api/*`);
-  console.log(`🏛️ Bureau of Indian Standards Intelligence Engine ready`);
-  console.log(`==================================================`);
-});
+export default app;
+
+// Vercel imports the app as a serverless handler; local development still
+// starts the Express listener through `npm run server`.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`SUGAM-AI Express Server active on http://localhost:${PORT}`);
+    console.log(`REST API endpoints mounted under /api/*`);
+  });
+}
