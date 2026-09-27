@@ -28,6 +28,93 @@ export interface ChatResponsePayload {
   productContext?: any;
 }
 
+function buildLiveSearchPrompt(userQuery: string, productContext: any, localStandard: any): string {
+  return `You are SUGAM-AI, a senior Bureau of Indian Standards (BIS) compliance intelligence assistant used by Indian manufacturers, MSMEs and compliance teams.
+
+Use your real-time web search tool to look up current, accurate information from official and authoritative sources (bis.gov.in, services.bis.gov.in, egazette.gov.in, PIB, ministry notifications, official BIS Quality Control Orders) before answering. Do not answer purely from memory — verify IS numbers, clause references, mandatory/voluntary status and fees against what you find online, since BIS standards, QCOs and fees are revised periodically.
+
+User Question: "${userQuery}"
+Product Context (as understood so far): ${JSON.stringify(productContext)}
+
+A local reference lookup (may be outdated, use only as a rough starting hint) suggested: ${localStandard?.is_code || 'none'} — ${localStandard?.title || 'n/a'}.
+
+Respond in this structured format (use Markdown headings):
+### Applicable Standard
+IS number + title, and whether it is Mandatory (QCO enforced) or Voluntary.
+
+### Why it applies
+Brief, specific reasoning tied to the product described.
+
+### Key requirements
+Bullet points of the main clauses/requirements.
+
+### Required tests
+Bullet list of mandatory tests.
+
+### Required documents
+Bullet list of documents needed for BIS licence application.
+
+### Next action
+One concrete next step for the user.
+
+### Sources
+List the specific web sources (with URLs) you used to verify this answer.
+
+If you are not fully certain about a detail (e.g. exact clause number or current fee), say so plainly instead of guessing, and recommend the user cross-check on the official BIS portal (bis.gov.in / manakonline.bis.gov.in). Keep the tone professional and concise. Answer in the same language the user asked in (Hindi/Hinglish/English).`;
+}
+
+async function callGeminiWithSearch(prompt: string, apiKey: string): Promise<string> {
+  const model = process.env.AI_MODEL || 'gemini-2.5-flash';
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ google_search: {} }] })
+    });
+    if (!res.ok) {
+      console.warn(`[AI] Gemini API error (${res.status}):`, await res.text());
+      return '';
+    }
+    const data = await res.json();
+    const candidate = data.candidates?.[0];
+    let text: string = candidate?.content?.parts?.map((part: any) => part.text).filter(Boolean).join('\n') || '';
+    const chunks = candidate?.groundingMetadata?.groundingChunks;
+    if (text && chunks?.length && !/### Sources/i.test(text)) {
+      const links = chunks
+        .map((chunk: any) => chunk.web?.uri && chunk.web?.title ? `- [${chunk.web.title}](${chunk.web.uri})` : null)
+        .filter(Boolean)
+        .slice(0, 6);
+      if (links.length) text += `\n\n### Sources\n${links.join('\n')}`;
+    }
+    return text;
+  } catch (error) {
+    console.warn('[AI] Gemini live search call failed, falling back:', error);
+    return '';
+  }
+}
+
+async function callOpenAIWithSearch(prompt: string, apiKey: string): Promise<string> {
+  const model = process.env.AI_MODEL || 'gpt-4.1-mini';
+  try {
+    const res = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, input: prompt, tools: [{ type: 'web_search' }] })
+    });
+    if (!res.ok) {
+      console.warn(`[AI] OpenAI API error (${res.status}):`, await res.text());
+      return '';
+    }
+    const data = await res.json();
+    if (typeof data.output_text === 'string' && data.output_text.trim()) return data.output_text;
+    const messageItem = data.output?.find((item: any) => item.type === 'message');
+    return messageItem?.content?.map((content: any) => content.text).filter(Boolean).join('\n') || '';
+  } catch (error) {
+    console.warn('[AI] OpenAI live search call failed, falling back:', error);
+    return '';
+  }
+}
+
 export async function processChatMessage(
   userId: string,
   conversationId: string,
@@ -96,34 +183,21 @@ ${clarification.reason}
   const openaiKey = process.env.OPENAI_API_KEY;
 
   let responseContent = '';
-  const confidence = matchResult ? matchResult.confidence : 0.88;
+  let confidence = matchResult ? matchResult.confidence : 0.88;
+
+  const liveSearchPrompt = buildLiveSearchPrompt(userQuery, mergedInfo, standard);
 
   if (geminiKey) {
-    try {
-      // Real Gemini API Call if user provides key
-      const prompt = `You are SUGAM-AI, a senior BIS compliance intelligence assistant.
-User Question: "${userQuery}"
-Product Context: ${JSON.stringify(mergedInfo)}
-Applicable Standard: ${standard.is_code} (${standard.title})
-Clauses: ${JSON.stringify(standard.clauses.map((c: any) => `${c.clause_number}: ${c.title}`))}
-Required Tests: ${JSON.stringify(standard.tests.map((t: any) => t.test_name))}
-Required Documents: ${JSON.stringify(standard.documents.map((d: any) => d.document_name))}
+    responseContent = await callGeminiWithSearch(liveSearchPrompt, geminiKey);
+  }
 
-Provide a structured, professional, grounded response following this exact format:
-Applicable Standard, Why it applies, Key requirements, Required tests, Required documents, Next action, Confidence, and Source citation.`;
+  if (!responseContent && openaiKey) {
+    responseContent = await callOpenAIWithSearch(liveSearchPrompt, openaiKey);
+  }
 
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-      });
-      const data = await res.json();
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        responseContent = data.candidates[0].content.parts[0].text;
-      }
-    } catch (e) {
-      console.warn('[AI] External API call failed, falling back to local engine:', e);
-    }
+  if (responseContent) {
+    confidence = Math.max(confidence, 0.9);
+    responseContent += `\n\n---\n*⚡ Answered using live web search (real-time lookup), not static demo data. Always cross-verify critical filings on the official [BIS portal](https://www.bis.gov.in).*`;
   }
 
   // 3. High-Precision Local BIS Knowledge Engine (Standard Fallback or Primary)
@@ -189,8 +263,8 @@ ${standard.documents.slice(0, 4).map((d: any, i: number) => `- ${d.document_name
 ### Next action:
 Verify your raw material mill certificates and initialize the **Compliance Navigator** to track testing progress.
 
-**Source:** BIS Knowledge Base (Demonstration Record) | ${standard.clauses?.[0]?.clause_number || 'Clause 4.2'}, ${standard.clauses?.[1]?.clause_number || 'Clause 5.1'}  
-*Disclaimer: Demo data for prototype demonstration. Confirm current specifications with official BIS gazette.*`;
+**Source:** Local BIS Reference Engine | ${standard.clauses?.[0]?.clause_number || 'Clause 4.2'}, ${standard.clauses?.[1]?.clause_number || 'Clause 5.1'}
+*⚠️ No live AI key configured (GEMINI_API_KEY / OPENAI_API_KEY), so this answer comes from a static local reference, not real-time search. Add a key in your .env to enable live-verified answers. Always confirm current specifications on the official [BIS portal](https://www.bis.gov.in).*`;
     }
   }
 
