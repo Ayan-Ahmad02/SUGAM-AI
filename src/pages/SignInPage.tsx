@@ -20,7 +20,7 @@ export const SignInPage: React.FC = () => {
     setLoading(true);
     await login(email, password);
     setLoading(false);
-    navigate('/dashboard');
+    navigate('/loading');
   };
 
   const handleQuickDemo = async (role: 'Manufacturer' | 'Admin') => {
@@ -31,7 +31,7 @@ export const SignInPage: React.FC = () => {
       await login('demo@sugam.ai', 'password123', 'Manufacturer');
     }
     setLoading(false);
-    navigate('/dashboard');
+    navigate('/loading');
   };
 
   return (

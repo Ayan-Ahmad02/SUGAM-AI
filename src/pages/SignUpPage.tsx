@@ -26,14 +26,14 @@ export const SignUpPage: React.FC = () => {
       });
       if (res.ok) {
         await login(email, password, role);
-        navigate('/dashboard');
+        navigate('/loading');
       } else {
         await login(email, password, role);
-        navigate('/dashboard');
+        navigate('/loading');
       }
     } catch {
       await login(email, password, role);
-      navigate('/dashboard');
+      navigate('/loading');
     } finally {
       setLoading(false);
     }

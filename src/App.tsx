@@ -8,6 +8,7 @@ import { SplashPage } from './pages/SplashPage';
 import { SignInPage } from './pages/SignInPage';
 import { SignUpPage } from './pages/SignUpPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { LoadingLaunchPage } from './pages/LoadingLaunchPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { AssistantPage } from './pages/AssistantPage';
 import { StandardsSearchPage } from './pages/StandardsSearchPage';
@@ -38,6 +39,7 @@ export const App: React.FC = () => {
             <Route path="/signin" element={<SignInPage />} />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/loading" element={<LoadingLaunchPage />} />
 
             {/* Authenticated / SaaS Workspace Layout */}
             <Route path="/" element={<AppLayout />}>

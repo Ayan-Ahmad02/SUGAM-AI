@@ -43,7 +43,7 @@ export const SplashPage: React.FC = () => {
       {/* Bottom Action Buttons */}
       <div className="w-full max-w-sm mx-auto space-y-3 pb-6">
         <Link
-          to="/dashboard"
+          to="/loading"
           className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-center text-sm shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transition-all"
         >
           <span>Get Started</span>

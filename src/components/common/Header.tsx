@@ -168,8 +168,8 @@ export const Header: React.FC = () => {
             )}
           </div>
 
-          {/* BIS Official Emblem */}
-          <div className="hidden xl:flex items-center border-l border-slate-200 pl-4">
+          {/* BIS Official Emblem - Always visible on desktop and tablet */}
+          <div className="hidden sm:flex items-center border-l border-slate-200/90 pl-3 lg:pl-4 shrink-0">
             <BISEmblem />
           </div>
         </div>
